@@ -76,8 +76,13 @@ func main() {
 		logger.Fatal(err)
 	}
 
+	wasmExecJS := os.Getenv("WASM_EXEC_JS")
+	if wasmExecJS == "" {
+		wasmExecJS = path.Join(runtime.GOROOT(), "misc/wasm/wasm_exec.js")
+	}
+
 	// Setup web server.
-	handler, err := NewWASMServer(wasmFile, filterCPUProfile(argsCopy[1:]), logger)
+	handler, err := NewWASMServer(wasmFile, wasmExecJS, filterCPUProfile(argsCopy[1:]), logger)
 	if err != nil {
 		logger.Fatal(err)
 	}

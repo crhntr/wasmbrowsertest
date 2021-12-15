@@ -6,9 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -23,7 +21,7 @@ type wasmServer struct {
 	logger     *log.Logger
 }
 
-func NewWASMServer(wasmFile string, args []string, l *log.Logger) (http.Handler, error) {
+func NewWASMServer(wasmFile, wasmExecJS string, args []string, l *log.Logger) (http.Handler, error) {
 	var err error
 	srv := &wasmServer{
 		wasmFile: wasmFile,
@@ -37,7 +35,7 @@ func NewWASMServer(wasmFile string, args []string, l *log.Logger) (http.Handler,
 		srv.envMap[vars[0]] = vars[1]
 	}
 
-	buf, err := ioutil.ReadFile(path.Join(runtime.GOROOT(), "misc/wasm/wasm_exec.js"))
+	buf, err := ioutil.ReadFile(wasmExecJS)
 	if err != nil {
 		return nil, err
 	}
@@ -90,7 +88,7 @@ func (ws *wasmServer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-const indexHTML = `<!doctype html>
+const indexHTML = /* language=gohtml */ `<!doctype html>
 <!--
 Copyright 2018 The Go Authors. All rights reserved.
 Use of this source code is governed by a BSD-style
